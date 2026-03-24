@@ -10,6 +10,7 @@ from sklearn.pipeline import Pipeline
 
 from src.data import load_dataset
 from src.features import CATEGORICAL_FEATURES, NUMERIC_FEATURES, build_preprocessor
+from src.evaluate import evaluate_classification_model
 
 
 MODEL_PATH = Path("models/model.joblib")
@@ -64,6 +65,9 @@ def main() -> None:
     MODEL_PATH.parent.mkdir(parents=True, exist_ok=True)
     joblib.dump(pipeline, MODEL_PATH)
     print(f"\nModel saved to: {MODEL_PATH}")
+    results = evaluate_classification_model(pipeline, X_train, X_test, y_train, y_test)
+    for key, value in results.items():
+        print(f"{key}: {value}")
 
 
 if __name__ == "__main__":
