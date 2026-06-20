@@ -5,7 +5,6 @@ from contextlib import AsyncExitStack
 from mcp.client.stdio import StdioServerParameters, stdio_client
 from mcp.types import Resource , ResourceTemplate, BlobResourceContents, TextResourceContents
 import logging
-import json
 
 logger = logging.getLogger(__name__)
 
