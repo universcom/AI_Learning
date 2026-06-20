@@ -48,6 +48,9 @@ class MCPClinet:
         - name: The name of the resource.
         - description: A brief description of the resource.
         - mimeType: The MIME type of the resource's content (e.g. "text/plain", "application/json").
+        - size: The size of the resource's content in bytes, if known.
+        - annotations: Optional metadata providing additional context about the resource.
+        - model_config: Pydantic model configuration for the object.
         """
         if not self._connected:
             raise RuntimeError("Client not connected to a server")
@@ -60,12 +63,15 @@ class MCPClinet:
     
     async def get_available_resource_templates(self) -> list[ResourceTemplate]:
         """
-        Fetches the list of available resource templates from the server and returns them as a list of ResourceTemplate objects. Each ResourceTemplate object contains the following information:
+        Fetches the list of available resource templates from the server and returns them as a list of ResourceTemplate objects.
+        A ResourceTemplate has almost the same set of properties as a Resource, except it has a uriTemplate instead of a uri:
+        - uriTemplate: The URI template (RFC 6570) describing how to construct a resource URI, including the parameters the client must supply.
         - name: The name of the resource template.
         - description: A brief description of the resource template.
-        - uriTemplate: The URI template (RFC 6570) describing how to construct a resource URI, including the parameters the client must supply.
         - mimeType: The MIME type of the resources produced by this template, if known.
-        - annotations: Any additional metadata or annotations associated with the resource template, which can provide further context about its functionality or usage.
+        - size: The size of the resource's content in bytes, if known.
+        - annotations: Optional metadata providing additional context about the resource template.
+        - model_config: Pydantic model configuration for the object.
         """
         if not self._connected:
             raise RuntimeError("Client not connected to a server")
