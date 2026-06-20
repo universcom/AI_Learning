@@ -1,5 +1,5 @@
 from mcp import ClientSession
-from mcp.types import Prompt
+from mcp.types import Prompt, PromptMessage
 from mcp.client.stdio import StdioServerParameters, stdio_client
 from contextlib import AsyncExitStack
 import logging
@@ -68,4 +68,37 @@ class MCPClient:
         if not prompt_result.prompts:
             logger.warning("No prompts found on server")
         return prompt_result.prompts
+    
+    async def load_prompt(self, name: str, arguments: dict[str, str]) -> list[PromptMessage]:
+        """
+        Loads a single prompt from the server and renders it into concrete messages.
+
+        Given a prompt's name and the arguments it expects, this asks the server to fill
+        in its message template and return the resulting conversation messages, ready to
+        be sent to an LLM.
+
+        Args:
+            name: The name of the prompt to load (as exposed by get_available_prompts).
+            arguments: A mapping of argument names to values used to fill the template.
+
+        Each returned PromptMessage object carries:
+        - role: The role of the message, e.g. "user" or "assistant".
+        - content: The rendered content of the message (text, image, audio, or an
+          embedded resource).
+
+        Returns:
+            A list of PromptMessage objects, or an empty list if the prompt yields none.
+        """
+        # Guard against loading before a session has been established.
+        if not self._connected:
+            raise RuntimeError("Client not connected to a server")
+
+        # Ask the server to render the named prompt with the supplied arguments.
+        prompt_load_result = await self._session.get_prompt(name=name, arguments=arguments)
+
+        if not prompt_load_result.messages:
+            logger.warning(f"No prompt found for prompt {name}")
+        else:
+            logger.warning(f"Loaded prompt {name} with description {prompt_load_result.description}")
+        return prompt_load_result.messages
     
